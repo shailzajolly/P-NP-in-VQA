@@ -51,11 +51,22 @@ bash get_j_feats.sh
 bash train_yn.sh
   ```
 
-
-
 ## Notes
 - Some of `preproc.py` and `utils.py` are based on [this repo](https://github.com/markdtw/vqa-winner-cvprw-2017) 
 
 ## Resources
 - [The paper](https://arxiv.org/pdf/1708.02711.pdf).
 - [Their CVPR Workshop slides](http://cs.adelaide.edu.au/~Damien/Research/VQA-Challenge-Slides-TeneyAnderson.pdf).
+
+## Citation
+If you plan to use this code as part of your published research, we'd appreciate it if you could cite our paper:
+```
+@misc{jolly2020p,
+    title={P $\approx$ NP, at least in Visual Question Answering},
+    author={Shailza Jolly and Sebastian Palacio and Joachim Folz and Federico Raue and Joern Hees and Andreas Dengel},
+    year={2020},
+    eprint={2003.11844},
+    archivePrefix={arXiv},
+    primaryClass={cs.CV}
+}
+```
