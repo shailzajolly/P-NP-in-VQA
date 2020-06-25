@@ -25,19 +25,24 @@ class yn_dataset(Dataset):
         if train:
             prefix = 'train'
             #datapath1 = os.path.join(root, 'yn_' + prefix + '_qa.pkl')
-            #j_path = os.path.join(root, 'non_yn_train_jfeats.pkl')
+            j_path = os.path.join(root, 'pjfeats_train_np_ans.pkl')
+            datapath = os.path.join(root, 'train_qa.pkl') 
             #j_path1 = os.path.join(root, 'yn_' + prefix + '_jfeats.pkl')
         else:
             prefix = 'val'
             #datapath = os.path.join(root, 'yn_' + prefix + '_qa.pkl')
             #j_path = os.path.join(root, 'yn_' + prefix + '_jfeats.pkl')
+            j_path = os.path.join(root, 'ORIG_pjfeats_val_np_ans.pkl')
+            datapath = os.path.join(root, 'ORIG_val_qa.pkl')  
         print("Loading preprocessed files... ({})".format(prefix))
-        qass = pickle.load(open(os.path.join(root, prefix + '_qa.pkl'), 'rb'))
+        #qass = pickle.load(open(os.path.join(root, prefix + '_qa.pkl'), 'rb'))
+        qass = pickle.load(open(datapath, 'rb'))
         qass = [qass]
         
         idx2ans, ans2idx = pickle.load(open(os.path.join(root, 'dict_ans.pkl'), 'rb'))
 
-        joint_embed = pickle.load(open(os.path.join(root, 'pjfeats_' + prefix + '_np_ans.pkl'), 'rb'))
+        #joint_embed = pickle.load(open(os.path.join(root, 'pjfeats_' + prefix + '_np_ans.pkl'), 'rb'))
+        joint_embed = pickle.load(open(j_path, 'rb'))
         joint_embed = [joint_embed]
         '''
         if train:
@@ -126,14 +131,13 @@ def evaluate(val_loader, model, epoch, device, logger):
         logits = model(j)
 
         loss = F.binary_cross_entropy_with_logits(logits, a) * a.size(1)
-        score = compute_score(logits, a)
-        preds = torch.max(logits, 1)[1].data
+        scores, score = compute_score(logits, a)
         
-        preds_d += [(idx.item(), pred.item()) for idx, pred in zip(q_id, preds.cpu())]
+        preds_d += [(idx.item(), pred) for idx, pred in zip(q_id, scores)]
         
         logger.batch_info_eval(epoch, step, batches, loss.item(), score)
 
-    #pickle.dump(preds_d, open('tr_nonyn_yn_model_preds.pkl', 'wb'))
+    pickle.dump(preds_d, open('tr_nonyn_yn_model_preds.pkl', 'wb'))
     score = logger.batch_info_eval(epoch, -1, batches)
     return score
 
@@ -158,7 +162,7 @@ def train(train_loader, model, optim, epoch, device, logger):
         optim.step()
 
         batch_time = time.time() - start
-        score = compute_score(logits, a)
+        _, score = compute_score(logits, a)
         logger.batch_info(epoch, step, batches, data_time, loss.item(), score, batch_time)
         start = time.time()
 

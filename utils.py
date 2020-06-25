@@ -96,7 +96,7 @@ def compute_score(logits, labels):
     one_hots = torch.zeros(*labels.size()).cuda()
     one_hots.scatter_(1, logits.view(-1, 1), 1)
     score = (one_hots * labels)
-    return score.cpu().numpy().sum() / logits.shape[0]
+    return score.cpu().numpy().sum(axis=1), score.cpu().numpy().sum() / logits.shape[0]
 
 
 def save_ckpt(score, bscore, epoch, model, optim, save, logger):
